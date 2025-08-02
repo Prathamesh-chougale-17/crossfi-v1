@@ -1,10 +1,13 @@
 "use client";
 
-import { Bot, Download, Share2, Store, Users, Loader2, Save, ArrowLeft } from "lucide-react";
+import { Bot, Download, Share2, Store, Users, Loader2, Save, ArrowLeft, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
+import { NFTMintDialog } from "@/components/gamefi/nft-mint-dialog";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
+import type { GameClient } from "@/lib/models";
 import Link from "next/link";
+import { useGameFi, useCrossFiNetwork } from "@/lib/gamefi/gamefi-context";
 
 interface HeaderProps {
   onExport: () => void;
@@ -23,6 +26,8 @@ interface HeaderProps {
   isPublishedToMarketplace?: boolean;
   isPublishedToCommunity?: boolean;
   onGeneratingChange?: (isGenerating: boolean) => void;
+  game?: GameClient;
+  onNFTMinted?: (tokenId: string) => void;
 }
 
 export function Header({
@@ -41,10 +46,12 @@ export function Header({
   checkpointCount,
   isPublishedToMarketplace,
   isPublishedToCommunity,
-  onGeneratingChange
+  onGeneratingChange,
+  game,
+  onNFTMinted
 }: HeaderProps) {
-  // const iconClass = "mr-2 h-4 w-4 drop-shadow-[0_0_2px_hsl(var(--accent))]";
-  // const buttonClass = "transition-all hover:text-accent hover:drop-shadow-[0_0_4px_hsl(var(--accent))]";
+  const { isCrossFi } = useCrossFiNetwork();
+  const { mintGameNFT } = useGameFi();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -126,6 +133,27 @@ export function Header({
 
           {/* Publishing Actions */}
           <div className="hidden md:flex items-center gap-1 ml-2 pl-2 border-l border-border/40">
+            {/* NFT Mint Button - CrossFi only */}
+            {isCrossFi && isGameGenerated && game && (
+              <NFTMintDialog
+                game={game}
+                gameCode={{ html, css, javascript: js }}
+                onMintSuccess={(tokenId) => {
+                  onNFTMinted?.(tokenId);
+                }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-purple-500/10 hover:text-purple-600 transition-all duration-200"
+                  disabled={isSaving}
+                >
+                  <Coins className="h-4 w-4 mr-2" />
+                  <span className="hidden lg:inline">Mint NFT</span>
+                </Button>
+              </NFTMintDialog>
+            )}
+
             <Button
               variant="ghost"
               size="sm"

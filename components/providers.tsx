@@ -16,6 +16,8 @@ import {
 } from "@tanstack/react-query";
 import { ReactNode } from 'react';
 import { WalletProvider } from '@/lib/wallet/wallet-context';
+import { GameFiProvider } from '@/lib/gamefi/gamefi-context';
+import { crossfiMainnet, crossfiTestnet } from '@/lib/gamefi/crossfi-config';
 
 // Import RainbowKit styles
 import '@rainbow-me/rainbowkit/styles.css';
@@ -25,15 +27,16 @@ interface ProvidersProps {
 }
 
 const config = getDefaultConfig({
-    appName: 'MediChainX',
+    appName: 'Jeu Plaza - GameFi Platform',
     projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'default',
     chains: [
+        crossfiMainnet, // CrossFi as primary chain
         mainnet, 
         polygon, 
         optimism, 
         arbitrum, 
         base, 
-        ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [sepolia] : [])
+        ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [crossfiTestnet, sepolia] : [])
     ],
     ssr: true, // If your dApp uses server side rendering (SSR)
 });
@@ -46,7 +49,9 @@ export function Providers({ children }: ProvidersProps) {
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider>
                     <WalletProvider>
-                        {children}
+                        <GameFiProvider>
+                            {children}
+                        </GameFiProvider>
                     </WalletProvider>
                 </RainbowKitProvider>
             </QueryClientProvider>
