@@ -158,6 +158,53 @@ export default function GameFiDashboard() {
               </div>
             </div>
 
+            {/* Testnet Contract Information */}
+            {networkName.toLowerCase().includes('testnet') && (
+              <Card className="mb-6 bg-gradient-to-r from-blue-500/5 to-purple-500/5 border-blue-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-blue-500" />
+                    Testnet Contract Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Game NFT Contract:</div>
+                      <div className="font-mono text-xs bg-muted p-2 rounded border">
+                        0x6C37D13C863193bdCcd2273Dc65488059e87fB17
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open('https://test.xfiscan.com/address/0x6C37D13C863193bdCcd2273Dc65488059e87fB17', '_blank')}
+                      >
+                        View on Explorer <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Platform Token (JEU):</div>
+                      <div className="font-mono text-xs bg-muted p-2 rounded border">
+                        0x96B8FB295da7070703e33CdE38E32cd6eA42e62e
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open('https://test.xfiscan.com/address/0x96B8FB295da7070703e33CdE38E32cd6eA42e62e', '_blank')}
+                      >
+                        View on Explorer <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
+                    <div className="text-sm text-blue-700 dark:text-blue-300">
+                      💡 These contracts are deployed on CrossFi Testnet. Games created here will mint NFTs and earn JEU tokens.
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Portfolio Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">

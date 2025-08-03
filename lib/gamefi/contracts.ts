@@ -79,8 +79,8 @@ export const PLATFORM_TOKEN_ABI = [
 export const CONTRACT_CONFIGS: Record<number, ContractConfig> = {
   // CrossFi Testnet
   4157: {
-    gameNFT: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512', // Will be updated after testnet deployment
-    platformToken: '0x5FbDB2315678afecb367f032d93F642f64180aa3', // Will be updated after testnet deployment
+    gameNFT: '0x6C37D13C863193bdCcd2273Dc65488059e87fB17', // Updated with actual deployment
+    platformToken: '0x96B8FB295da7070703e33CdE38E32cd6eA42e62e', // Updated with actual deployment
     marketplace: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     staking: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
     governance: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',

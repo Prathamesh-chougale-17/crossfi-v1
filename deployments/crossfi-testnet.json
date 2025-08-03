@@ -1,0 +1,20 @@
+{
+  "network": "crossfi-testnet",
+  "chainId": 4157,
+  "deployer": "0xC6754E549C0D341612A53f16879c14e1CDA0269f",
+  "contracts": {
+    "platformToken": {
+      "address": "0x96B8FB295da7070703e33CdE38E32cd6eA42e62e",
+      "name": "Jeu Token",
+      "symbol": "JEU",
+      "totalSupply": "103000000.0"
+    },
+    "gameNFT": {
+      "address": "0x6C37D13C863193bdCcd2273Dc65488059e87fB17",
+      "name": "Jeu Plaza Game NFT",
+      "symbol": "JPGAME"
+    }
+  },
+  "timestamp": "2025-08-03T13:36:22.653Z",
+  "gasUsed": "Estimated deployment cost calculated during deployment"
+}

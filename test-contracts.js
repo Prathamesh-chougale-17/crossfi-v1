@@ -6,13 +6,12 @@ async function testContracts() {
   
   try {
     // Get deployment info
-    const deploymentInfo = require('./deployments/localhost.json');
+    const deploymentInfo = require('./deployments/crossfi-testnet.json');
     console.log('📦 Deployment info:', deploymentInfo);
     
     // Get signers
-    const [deployer, user1] = await ethers.getSigners();
+    const [deployer] = await ethers.getSigners();
     console.log('👤 Deployer:', deployer.address);
-    console.log('👤 User1:', user1.address);
     
     // Connect to contracts
     const PlatformToken = await ethers.getContractFactory('PlatformToken');
@@ -34,7 +33,7 @@ async function testContracts() {
     // Test NFT minting
     console.log('\n🎮 Testing Game NFT...');
     const mintTx = await gameNFT.mintGame(
-      user1.address,
+      deployer.address,
       'Test Game',
       'A test game for verification',
       'https://ipfs.io/ipfs/QmTest/metadata.json',
