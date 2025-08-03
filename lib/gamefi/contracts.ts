@@ -86,29 +86,29 @@ export const CONTRACT_CONFIGS: Record<number, ContractConfig> = {
     rpcUrl: 'https://rpc.testnet.crossfi.io',
   },
   // Local Development
-  31337: {
-    gameNFT: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-    platformToken: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+  1337: {
+    gameNFT: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+    platformToken: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
     marketplace: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     staking: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-    governance: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
-    chainId: 31337,
+    governance: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+    chainId: 1337,
     blockExplorer: 'http://localhost:8545',
     rpcUrl: 'http://localhost:8545',
   },
 };
 
 export class GameFiContracts {
-  private provider: ethers.providers.Provider;
-  private signer?: ethers.Signer;
+  private provider: any;
+  private signer?: any;
   private config: ContractConfig;
-  private gameNFTContract: ethers.Contract;
-  private platformTokenContract: ethers.Contract;
+  private gameNFTContract: any;
+  private platformTokenContract: any;
 
   constructor(
-    provider: ethers.providers.Provider,
+    provider: any,
     chainId: number,
-    signer?: ethers.Signer
+    signer?: any
   ) {
     this.provider = provider;
     this.signer = signer;
@@ -118,14 +118,15 @@ export class GameFiContracts {
       throw new Error(`Unsupported chain ID: ${chainId}`);
     }
 
-    // Initialize contracts
-    this.gameNFTContract = new ethers.Contract(
+    // Initialize contracts with new ethers v6 syntax
+    const ethersV6 = require('ethers');
+    this.gameNFTContract = new ethersV6.Contract(
       this.config.gameNFT,
       GAME_NFT_ABI,
       signer || provider
     );
 
-    this.platformTokenContract = new ethers.Contract(
+    this.platformTokenContract = new ethersV6.Contract(
       this.config.platformToken,
       PLATFORM_TOKEN_ABI,
       signer || provider

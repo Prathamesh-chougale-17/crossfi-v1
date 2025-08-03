@@ -82,19 +82,22 @@ export function GameFiProvider({ children }: { children: React.ReactNode }) {
   // Check if on CrossFi network
   const isCrossFi = chainId ? isCrossFiNetwork(chainId) : false;
 
-  // Initialize contracts when connected to CrossFi
+  // Initialize contracts when connected
   useEffect(() => {
-    if (isConnected && isCrossFi && typeof window !== 'undefined') {
+    if (isConnected && typeof window !== 'undefined') {
       try {
         const { ethereum } = window as any;
         if (ethereum) {
-          // In a real implementation, you'd use the actual provider
-          // This is a simplified version for demonstration
-          console.log('GameFi contracts would be initialized here');
-          // const provider = new ethers.providers.Web3Provider(ethereum);
-          // const signer = provider.getSigner();
-          // const gamefiContracts = new GameFiContracts(provider, chainId, signer);
-          // setContracts(gamefiContracts);
+          const ethers = require('ethers');
+          const provider = new ethers.BrowserProvider(ethereum);
+          const signer = provider.getSigner();
+          
+          // Initialize for local development (chainId 1337) or CrossFi
+          const targetChainId = chainId === 1337 ? 1337 : chainId;
+          const gamefiContracts = new GameFiContracts(provider, targetChainId, signer);
+          setContracts(gamefiContracts);
+          
+          console.log('GameFi contracts initialized for chain:', targetChainId);
         }
       } catch (error) {
         console.error('Error initializing GameFi contracts:', error);
@@ -103,7 +106,7 @@ export function GameFiProvider({ children }: { children: React.ReactNode }) {
     } else {
       setContracts(null);
     }
-  }, [isConnected, isCrossFi, chainId]);
+  }, [isConnected, chainId]);
 
   // Load user data when contracts are ready
   useEffect(() => {

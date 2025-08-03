@@ -47,49 +47,19 @@ export default function GameFiDashboard() {
 
   const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
-  // Mock data for demonstration
-  const mockTokenBalance = tokenBalance || {
-    balance: '15000',
-    lockedBalance: '5000',
-    availableBalance: '10000',
-    totalEarned: '3250',
-    playToEarnTotal: '1200',
-    stakingTotal: '1500',
-    royaltyTotal: '550',
+  // Use real token balance or show loading state
+  const displayTokenBalance = tokenBalance || {
+    balance: '0',
+    lockedBalance: '0',
+    availableBalance: '0',
+    totalEarned: '0',
+    playToEarnTotal: '0',
+    stakingTotal: '0',
+    royaltyTotal: '0',
   };
 
-  const mockUserGames = userGames.length > 0 ? userGames : [
-    {
-      tokenId: '1',
-      creator: normalizedAddress || '',
-      owner: normalizedAddress || '',
-      gameTitle: 'Tank Battle Arena',
-      gameDescription: 'Epic multiplayer tank battles',
-      ipfsHash: 'QmExample1',
-      tokenURI: '',
-      createdAt: Date.now() - 7 * 24 * 60 * 60 * 1000,
-      totalPlays: 1250,
-      totalForks: 8,
-      totalStaked: '25000',
-      isActive: true,
-      gameScore: 8750,
-    },
-    {
-      tokenId: '2',
-      creator: normalizedAddress || '',
-      owner: normalizedAddress || '',
-      gameTitle: 'Puzzle Master',
-      gameDescription: 'Mind-bending puzzle challenges',
-      ipfsHash: 'QmExample2',
-      tokenURI: '',
-      createdAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
-      totalPlays: 890,
-      totalForks: 3,
-      totalStaked: '12000',
-      isActive: true,
-      gameScore: 6420,
-    },
-  ];
+  // Use real user games or empty array
+  const displayUserGames = userGames;
 
   if (!normalizedAddress) {
     return (
@@ -116,7 +86,10 @@ export default function GameFiDashboard() {
     );
   }
 
-  if (!isCrossFi) {
+  // Allow local development (chainId 1337) and CrossFi networks
+  const isValidNetwork = isCrossFi || (typeof window !== 'undefined' && window.location.hostname === 'localhost');
+  
+  if (!isValidNetwork && normalizedAddress) {
     return (
       <HeaderWrapper>
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
@@ -183,10 +156,10 @@ export default function GameFiDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-primary">
-                    {parseFloat(mockTokenBalance.balance).toLocaleString()} JEU
+                    {isLoadingBalance ? 'Loading...' : `${parseFloat(displayTokenBalance.balance).toLocaleString()} JEU`}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {parseFloat(mockTokenBalance.lockedBalance).toLocaleString()} locked in staking
+                    {isLoadingBalance ? '' : `${parseFloat(displayTokenBalance.lockedBalance).toLocaleString()} locked in staking`}
                   </div>
                 </CardContent>
               </Card>
@@ -200,7 +173,7 @@ export default function GameFiDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {parseFloat(mockTokenBalance.totalEarned).toLocaleString()} JEU
+                    {isLoadingBalance ? 'Loading...' : `${parseFloat(displayTokenBalance.totalEarned).toLocaleString()} JEU`}
                   </div>
                   <div className="text-xs text-muted-foreground">All-time earnings</div>
                 </CardContent>
@@ -214,7 +187,9 @@ export default function GameFiDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{mockUserGames.length}</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {isLoadingGames ? 'Loading...' : displayUserGames.length}
+                  </div>
                   <div className="text-xs text-muted-foreground">NFT games owned</div>
                 </CardContent>
               </Card>
@@ -301,12 +276,21 @@ export default function GameFiDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {[
-                      { action: 'Game NFT Minted', game: 'Tank Battle Arena', amount: '+500 JEU', time: '2 hours ago', type: 'mint' },
-                      { action: 'Royalty Earned', game: 'Puzzle Master', amount: '+25.5 JEU', time: '6 hours ago', type: 'royalty' },
-                      { action: 'Staking Reward', game: 'Racing Challenge', amount: '+12.3 JEU', time: '1 day ago', type: 'staking' },
-                      { action: 'Play-to-Earn', game: 'Tank Shooter', amount: '+8.7 JEU', time: '1 day ago', type: 'play' },
-                    ].map((activity, index) => (
+                    {displayUserGames.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Gamepad2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No activity yet. Create your first game to get started!</p>
+                      </div>
+                    ) : (
+                      displayUserGames.slice(0, 4).map((game, index) => {
+                        const activity = {
+                          action: 'Game NFT Minted',
+                          game: game.gameTitle || `Game #${game.tokenId}`,
+                          amount: '+0 JEU',
+                          time: new Date(game.createdAt || Date.now()).toLocaleDateString(),
+                          type: 'mint'
+                        };
+                        return (
                       <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
@@ -330,7 +314,9 @@ export default function GameFiDashboard() {
                           <div className="text-xs text-muted-foreground">{activity.time}</div>
                         </div>
                       </div>
-                    ))}
+                        );
+                      })
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -338,7 +324,7 @@ export default function GameFiDashboard() {
 
             <TabsContent value="royalties">
               <RoyaltyDashboard 
-                games={mockUserGames}
+                games={displayUserGames}
                 onClaimRoyalties={(gameId) => {
                   toast.success(`Royalties claimed for game ${gameId}!`);
                   refreshBalance();
@@ -348,7 +334,7 @@ export default function GameFiDashboard() {
 
             <TabsContent value="analytics">
               <AnalyticsDashboard 
-                games={mockUserGames}
+                games={displayUserGames}
                 timeframe={selectedTimeframe}
                 onTimeframeChange={setSelectedTimeframe}
               />
@@ -356,8 +342,8 @@ export default function GameFiDashboard() {
 
             <TabsContent value="governance">
               <GovernancePanel
-                tokenBalance={mockTokenBalance}
-                userVotingPower={mockTokenBalance.balance}
+                tokenBalance={displayTokenBalance}
+                userVotingPower={displayTokenBalance.balance}
                 onVote={(proposalId, support, votingPower) => {
                   toast.success(`Vote cast on proposal ${proposalId}!`);
                 }}
@@ -369,7 +355,7 @@ export default function GameFiDashboard() {
 
             <TabsContent value="rewards">
               <PlayToEarnTracker 
-                tokenBalance={mockTokenBalance}
+                tokenBalance={displayTokenBalance}
                 onClaimRewards={() => {
                   toast.success('Rewards claimed!');
                   refreshBalance();

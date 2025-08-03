@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title PlatformToken (JEU)
@@ -41,7 +41,7 @@ contract PlatformToken is ERC20, ERC20Burnable, Ownable, Pausable {
     event AuthorizedMinterAdded(address indexed minter);
     event AuthorizedMinterRemoved(address indexed minter);
     
-    constructor() ERC20("Jeu Token", "JEU") {
+    constructor() ERC20("Jeu Token", "JEU") Ownable(msg.sender) {
         // Mint initial supply to deployer
         _mint(msg.sender, INITIAL_SUPPLY);
         
@@ -208,13 +208,13 @@ contract PlatformToken is ERC20, ERC20Burnable, Ownable, Pausable {
     /**
      * @dev Override transfer functions to add pause functionality
      */
-    function _beforeTokenTransfer(
+    function _update(
         address from,
         address to,
         uint256 amount
     ) internal override {
         require(!paused(), "Token transfers paused");
-        super._beforeTokenTransfer(from, to, amount);
+        super._update(from, to, amount);
     }
     
     /**
