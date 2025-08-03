@@ -35,12 +35,16 @@ interface GameGeneratorDialogProps {
   css: string;
   js: string;
   isGameGenerated: boolean;
+  checkpointCount?: number;
   onGeneratingChange?: (isGenerating: boolean) => void;
 }
 
-export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGameGenerated, onGeneratingChange }: GameGeneratorDialogProps) {
+export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGameGenerated, checkpointCount, onGeneratingChange }: GameGeneratorDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
+  
+  // Helper to determine if we're refining existing code or generating new code
+  const hasExistingCode = checkpointCount && checkpointCount > 0;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,9 +59,9 @@ export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGam
     try {
       const result = await generateGame({ 
         prompt: values.prompt,
-        previousHtml: isGameGenerated ? html : undefined,
-        previousCss: isGameGenerated ? css : undefined,
-        previousJs: isGameGenerated ? js : undefined,
+        previousHtml: hasExistingCode ? html : undefined,
+        previousCss: hasExistingCode ? css : undefined,
+        previousJs: hasExistingCode ? js : undefined,
       });
       onGenerate(result);
       setIsOpen(false);
@@ -83,9 +87,9 @@ export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGam
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>{isGameGenerated ? 'Refine Your Game' : 'Game Generator'}</DialogTitle>
+              <DialogTitle>{hasExistingCode ? 'Refine Your Game' : 'Game Generator'}</DialogTitle>
               <DialogDescription>
-                {isGameGenerated 
+                {hasExistingCode
                   ? 'Describe the changes or new features you want to add.' 
                   : 'Describe the game you want to create, and let AI build the code for you.'}
               </DialogDescription>
@@ -96,10 +100,10 @@ export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGam
                 name="prompt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isGameGenerated ? 'Feedback or Refinements' : 'Game Idea'}</FormLabel>
+                    <FormLabel>{hasExistingCode ? 'Feedback or Refinements' : 'Game Idea'}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder={isGameGenerated 
+                        placeholder={hasExistingCode
                           ? "e.g., Make the paddle smaller and the ball faster."
                           : "e.g., A simple breakout-style game with a paddle and a ball."}
                         className="resize-none"
@@ -121,7 +125,7 @@ export function GameGeneratorDialog({ onGenerate, children, html, css, js, isGam
                 ) : (
                   <>
                     <Bot className="mr-2 h-4 w-4" />
-                    {isGameGenerated ? 'Refine Code' : 'Generate Code'}
+                    {hasExistingCode ? 'Refine Code' : 'Generate Code'}
                   </>
                 )}
               </Button>

@@ -1,9 +1,11 @@
 "use client";
 
+import * as React from "react";
 import { Bot, Download, Share2, Store, Users, Loader2, Save, ArrowLeft, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
 import { TokenizeButton } from "./TokenizeButton";
+import { MCPDialog } from "./MCPDialog";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 import type { GameClient } from "@/lib/models";
 import Link from "next/link";
@@ -52,6 +54,14 @@ export function Header({
 }: HeaderProps) {
   const { isCrossFi } = useCrossFiNetwork();
   const { mintGameNFT } = useGameFi();
+
+  // Helper function to determine if we should show "Generate" or "Refine"
+  const hasExistingCode = checkpointCount && checkpointCount > 0;
+  
+  // Debug logging
+  React.useEffect(() => {
+    console.log(`Header: checkpointCount=${checkpointCount}, hasExistingCode=${hasExistingCode}, buttonText=${hasExistingCode ? 'Refine' : 'Generate'}`);
+  }, [checkpointCount, hasExistingCode]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -104,6 +114,7 @@ export function Header({
               css={css}
               js={js}
               isGameGenerated={isGameGenerated}
+              checkpointCount={checkpointCount}
               onGeneratingChange={onGeneratingChange}
             >
               <Button
@@ -114,7 +125,7 @@ export function Header({
               >
                 <Bot className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">
-                  {isGameGenerated ? 'Refine' : 'Generate'}
+                  {hasExistingCode ? 'Refine' : 'Generate'}
                 </span>
               </Button>
             </GameGeneratorDialog>
@@ -177,6 +188,8 @@ export function Header({
 
           {/* Utility Actions */}
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border/40">
+            <MCPDialog />
+
             <Button
               variant="ghost"
               size="sm"
