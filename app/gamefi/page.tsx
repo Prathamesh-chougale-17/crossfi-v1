@@ -29,6 +29,10 @@ import { GovernancePanel } from '@/components/gamefi/governance-panel';
 import { useGameFi } from '@/lib/gamefi/gamefi-context';
 import { useWallet } from '@/lib/wallet/wallet-context';
 import { useCrossFiNetwork } from '@/lib/gamefi/gamefi-context';
+import { AddCrossFiNetwork } from '@/components/add-crossfi-network';
+import { NetworkDebug } from '@/components/network-debug';
+import { ManualNetworkSwitch } from '@/components/manual-network-switch';
+import { ForceTestnetConnection } from '@/components/force-testnet-connection';
 
 export default function GameFiDashboard() {
   const { normalizedAddress } = useWallet();
@@ -94,7 +98,7 @@ export default function GameFiDashboard() {
       <HeaderWrapper>
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
           <div className="container mx-auto px-4 py-16">
-            <Card className="max-w-2xl mx-auto">
+            <Card className="max-w-4xl mx-auto">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Zap className="h-16 w-16 text-orange-500 mb-6" />
                 <h2 className="text-2xl font-bold mb-4">Switch to CrossFi Network</h2>
@@ -106,10 +110,19 @@ export default function GameFiDashboard() {
                 <div className="text-sm text-muted-foreground mb-6">
                   Current network: <Badge variant="outline">{networkName}</Badge>
                 </div>
-                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500">
-                  <Zap className="h-5 w-5 mr-2" />
-                  Switch to CrossFi
-                </Button>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                  <AddCrossFiNetwork variant="testnet" />
+                  <AddCrossFiNetwork variant="mainnet" />
+                </div>
+                
+                <p className="text-xs text-muted-foreground mt-4 text-center">
+                  💡 Tip: For development and testing, use CrossFi Testnet. For production use, switch to CrossFi Mainnet.
+                </p>
+                
+                <NetworkDebug />
+                <ManualNetworkSwitch />
+                <ForceTestnetConnection />
               </CardContent>
             </Card>
           </div>
