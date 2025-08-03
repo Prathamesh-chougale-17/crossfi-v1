@@ -118,68 +118,39 @@ export function RoyaltyDashboard({ games, onClaimRoyalties }: RoyaltyDashboardPr
 
   return (
     <div className="space-y-6">
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Coins className="h-4 w-4 text-green-500" />
-              Total Earned
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {totalEarnings.toFixed(2)} JEU
+      {/* Royalty Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Coins className="h-5 w-5 text-green-500" />
+            Royalty Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Earned</span>
+                <span className="font-semibold text-green-600">{totalEarnings.toFixed(2)} JEU</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Pending</span>
+                <span className="font-semibold text-blue-600">{totalPending.toFixed(2)} JEU</span>
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground">All-time earnings</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
-              Pending
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {totalPending.toFixed(2)} JEU
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Plays</span>
+                <span className="font-semibold">{totalPlays.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Forks</span>
+                <span className="font-semibold">{totalForks}</span>
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground">Ready to claim</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Play className="h-4 w-4 text-purple-500" />
-              Total Plays
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              {totalPlays.toLocaleString()}
-            </div>
-            <div className="text-xs text-muted-foreground">Across all games</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <GitFork className="h-4 w-4 text-orange-500" />
-              Total Forks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {totalForks}
-            </div>
-            <div className="text-xs text-muted-foreground">Community forks</div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Control Bar */}
       <div className="flex items-center justify-between">

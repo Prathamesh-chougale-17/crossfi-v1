@@ -181,64 +181,37 @@ export function AnalyticsDashboard({
         </Button>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Gamepad2 className="h-4 w-4 text-blue-500" />
-              Total Games
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.totalGames}</div>
-            <div className="text-xs text-muted-foreground">
-              +{Math.floor(Math.random() * 5) + 1} this week
+      {/* Analytics Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-blue-500" />
+            Analytics Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{analyticsData.totalGames}</div>
+              <div className="text-xs text-muted-foreground">Total Games</div>
+              <div className="text-xs text-green-600">+{Math.floor(Math.random() * 5) + 1} this week</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Users className="h-4 w-4 text-green-500" />
-              Active Players
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(analyticsData.totalPlayers)}</div>
-            <div className="text-xs text-green-600">
-              +{analyticsData.growthRate}% growth
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{formatNumber(analyticsData.totalPlayers)}</div>
+              <div className="text-xs text-muted-foreground">Active Players</div>
+              <div className="text-xs text-green-600">+{analyticsData.growthRate}% growth</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-purple-500" />
-              Total Earnings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(+analyticsData.totalEarnings)} JEU</div>
-            <div className="text-xs text-muted-foreground">Platform earnings</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-orange-500" />
-              Total Staked
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(+analyticsData.totalStaked)} JEU</div>
-            <div className="text-xs text-muted-foreground">Community staking</div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">{formatNumber(+analyticsData.totalEarnings)} JEU</div>
+              <div className="text-xs text-muted-foreground">Platform Earnings</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">{formatNumber(+analyticsData.totalStaked)} JEU</div>
+              <div className="text-xs text-muted-foreground">Community Staking</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="games" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">

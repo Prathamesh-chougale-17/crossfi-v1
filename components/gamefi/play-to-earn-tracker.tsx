@@ -203,59 +203,38 @@ export function PlayToEarnTracker({ tokenBalance, onClaimRewards }: PlayToEarnTr
 
         <TabsContent value="earnings" className="space-y-4">
           {/* Earnings Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-500" />
-                  Today
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.todayEarnings}</div>
-                <div className="text-xs text-muted-foreground">JEU</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  This Week
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.weeklyEarnings}</div>
-                <div className="text-xs text-muted-foreground">JEU</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-purple-500" />
-                  This Month
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">{stats.monthlyEarnings}</div>
-                <div className="text-xs text-muted-foreground">JEU</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Award className="h-4 w-4 text-orange-500" />
-                  All Time
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-600">{stats.totalEarnings}</div>
-                <div className="text-xs text-muted-foreground">JEU</div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Coins className="h-5 w-5 text-green-500" />
+                Earnings Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{stats.todayEarnings}</div>
+                  <div className="text-xs text-muted-foreground">Today</div>
+                  <div className="text-xs text-green-600">+{Math.floor(Math.random() * 20) + 5}% from yesterday</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{stats.weeklyEarnings}</div>
+                  <div className="text-xs text-muted-foreground">This Week</div>
+                  <div className="text-xs text-green-600">JEU earned</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{stats.monthlyEarnings}</div>
+                  <div className="text-xs text-muted-foreground">This Month</div>
+                  <div className="text-xs text-green-600">Monthly target: 400 JEU</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{stats.totalEarnings}</div>
+                  <div className="text-xs text-muted-foreground">All Time</div>
+                  <div className="text-xs text-green-600">Total earned</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Performance Stats */}
           <Card>

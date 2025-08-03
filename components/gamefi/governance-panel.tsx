@@ -271,59 +271,38 @@ export function GovernancePanel({
   return (
     <div className="space-y-6">
       {/* Governance Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Vote className="h-4 w-4 text-blue-500" />
-              Your Voting Power
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{parseFloat(userVotingPower).toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">JEU tokens</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Users className="h-4 w-4 text-green-500" />
-              Active Proposals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeProposals.length}</div>
-            <div className="text-xs text-muted-foreground">Awaiting votes</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-purple-500" />
-              Total Proposals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{proposals.length}</div>
-            <div className="text-xs text-muted-foreground">All time</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-orange-500" />
-              Participation Rate
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">67%</div>
-            <div className="text-xs text-muted-foreground">Average turnout</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Vote className="h-5 w-5 text-blue-500" />
+            Governance Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{parseFloat(userVotingPower).toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Your Voting Power</div>
+              <div className="text-xs text-green-600">JEU tokens</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{activeProposals.length}</div>
+              <div className="text-xs text-muted-foreground">Active Proposals</div>
+              <div className="text-xs text-green-600">Awaiting votes</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">{proposals.length}</div>
+              <div className="text-xs text-muted-foreground">Total Proposals</div>
+              <div className="text-xs text-green-600">All time</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">67%</div>
+              <div className="text-xs text-muted-foreground">Participation Rate</div>
+              <div className="text-xs text-green-600">Average turnout</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Create Proposal Button */}
       <div className="flex justify-between items-center">
