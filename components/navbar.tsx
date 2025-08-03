@@ -16,6 +16,7 @@ const routes = [
   { href: "/games", label: "Games" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/community", label: "Community" },
+  {href:"/gamefi", label: "GameFi" },
 ];
 
 export function Navbar() {

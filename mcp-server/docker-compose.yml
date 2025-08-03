@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: .
+    container_name: jeu-plaza-mcp-server
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-http://host.docker.internal:3000}
+      - API_KEY=${API_KEY:-jeu-plaza-mcp-secure-key-2024}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    # For MCP servers, we typically don't expose ports as they use stdio
+    # ports:
+    #   - "3001:3001"
+    
+    # Allow container to access host network (for connecting to your Next.js app)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Optional: If you want to run your main app in Docker too
+  # jeu-plaza-app:
+  #   build: ../
+  #   container_name: jeu-plaza-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - MONGODB_URI=${MONGODB_URI}
+  #     - GEMINI_API_KEY=${GEMINI_API_KEY}
+  #     - MCP_API_KEY=${MCP_API_KEY}
+  #   depends_on:
+  #     - mcp-server
