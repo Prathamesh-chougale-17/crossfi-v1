@@ -1141,3 +1141,68 @@ export async function forkCommunityGame(input: {
         throw new Error('Failed to fork community game');
     }
 }
+
+// ===== TOKENIZATION FUNCTIONS =====
+
+const UpdateGameTokenizationSchema = z.object({
+    gameId: z.string().min(1, 'Game ID is required'),
+    walletAddress: WalletAddressSchema,
+    tokenId: z.string().min(1, 'Token ID is required'),
+    ipfsHash: z.string().min(1, 'IPFS hash is required'),
+});
+
+/**
+ * Updates a game with tokenization information after NFT minting
+ * @param input - Object containing game ID, wallet address, token ID, and IPFS hash
+ * @returns True if update was successful
+ */
+export async function updateGameTokenization(input: {
+    gameId: string;
+    walletAddress: string;
+    tokenId: string;
+    ipfsHash: string;
+}): Promise<boolean> {
+    const validatedInput = UpdateGameTokenizationSchema.parse(input);
+
+    try {
+        const gamesCollection = await getGamesCollection();
+
+        // Validate ObjectId format
+        if (!ObjectId.isValid(validatedInput.gameId)) {
+            throw new Error('Invalid game ID format');
+        }
+
+        const gameObjectId = new ObjectId(validatedInput.gameId);
+
+        // First verify that the game exists and is owned by the wallet
+        const game = await gamesCollection.findOne({
+            _id: gameObjectId,
+            walletAddress: validatedInput.walletAddress,
+        });
+
+        if (!game) {
+            throw new Error('Game not found or not owned by this wallet');
+        }
+
+        // Update the game's tokenization status
+        const result = await gamesCollection.updateOne(
+            { _id: gameObjectId },
+            {
+                $set: {
+                    tokenId: validatedInput.tokenId,
+                    ipfsHash: validatedInput.ipfsHash,
+                    tokenizedAt: new Date(),
+                    updatedAt: new Date(),
+                }
+            }
+        );
+
+        return result.modifiedCount === 1;
+    } catch (error) {
+        console.error('Error updating game tokenization:', error);
+        if (error instanceof z.ZodError) {
+            throw new Error(`Validation error: ${error.issues.map((issue) => issue.message).join(', ')}`);
+        }
+        throw new Error('Failed to update game tokenization');
+    }
+}

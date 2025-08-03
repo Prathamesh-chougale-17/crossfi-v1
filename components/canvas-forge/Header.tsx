@@ -3,7 +3,7 @@
 import { Bot, Download, Share2, Store, Users, Loader2, Save, ArrowLeft, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
-import { NFTMintDialog } from "@/components/gamefi/nft-mint-dialog";
+import { TokenizeButton } from "./TokenizeButton";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 import type { GameClient } from "@/lib/models";
 import Link from "next/link";
@@ -133,25 +133,17 @@ export function Header({
 
           {/* Publishing Actions */}
           <div className="hidden md:flex items-center gap-1 ml-2 pl-2 border-l border-border/40">
-            {/* NFT Mint Button - CrossFi only */}
-            {isCrossFi && isGameGenerated && game && (
-              <NFTMintDialog
-                game={game}
-                gameCode={{ html, css, javascript: js }}
-                onMintSuccess={(tokenId) => {
+            {/* Tokenize Button */}
+            {isGameGenerated && game && game._id && (
+              <TokenizeButton
+                gameId={game._id}
+                gameTitle={game.name}
+                gameDescription={game.description}
+                isTokenized={!!game.tokenId}
+                onTokenized={(tokenId) => {
                   onNFTMinted?.(tokenId);
                 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hover:bg-purple-500/10 hover:text-purple-600 transition-all duration-200"
-                  disabled={isSaving}
-                >
-                  <Coins className="h-4 w-4 mr-2" />
-                  <span className="hidden lg:inline">Mint NFT</span>
-                </Button>
-              </NFTMintDialog>
+              />
             )}
 
             <Button

@@ -85,24 +85,42 @@ export function GameFiProvider({ children }: { children: React.ReactNode }) {
   // Initialize contracts when connected
   useEffect(() => {
     if (isConnected && typeof window !== 'undefined') {
-      try {
-        const { ethereum } = window as any;
-        if (ethereum) {
-          const ethers = require('ethers');
-          const provider = new ethers.BrowserProvider(ethereum);
-          const signer = provider.getSigner();
+      const initializeContracts = async () => {
+        try {
+          const { ethereum } = window as any;
+          if (ethereum) {
+            // Dynamic import to avoid SSR issues
+            const { ethers } = await import('ethers');
+            const provider = new ethers.BrowserProvider(ethereum);
+            const signer = await provider.getSigner();
+            
+            // Initialize for local development (chainId 1337) or CrossFi
+            const targetChainId = chainId === 1337 ? 1337 : chainId;
+            const gamefiContracts = new GameFiContracts(provider, targetChainId, signer);
+            
+            // Wait for initialization to complete before setting contracts
+            await gamefiContracts.waitForInitialization();
+            setContracts(gamefiContracts);
+            
+            console.log('GameFi contracts initialized for chain:', targetChainId);
+          }
+        } catch (error) {
+          console.error('Error initializing GameFi contracts:', error);
           
-          // Initialize for local development (chainId 1337) or CrossFi
-          const targetChainId = chainId === 1337 ? 1337 : chainId;
-          const gamefiContracts = new GameFiContracts(provider, targetChainId, signer);
-          setContracts(gamefiContracts);
-          
-          console.log('GameFi contracts initialized for chain:', targetChainId);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          if (errorMessage.includes('ENS')) {
+            toast.error('Network Configuration Issue', {
+              description: 'CrossFi network detected. Some features may be limited due to ENS unavailability.',
+            });
+          } else {
+            toast.error('Failed to initialize GameFi contracts', {
+              description: errorMessage,
+            });
+          }
         }
-      } catch (error) {
-        console.error('Error initializing GameFi contracts:', error);
-        toast.error('Failed to initialize GameFi contracts');
-      }
+      };
+      
+      initializeContracts();
     } else {
       setContracts(null);
     }

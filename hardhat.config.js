@@ -21,7 +21,7 @@ module.exports = {
       chainId: 1337,
     },
     "crossfi-testnet": {
-      url: process.env.CROSSFI_TESTNET_RPC || "https://rpc.testnet.crossfi.io",
+      url: process.env.CROSSFI_TESTNET_RPC || "https://rpc.testnet.ms",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 4157,
     },

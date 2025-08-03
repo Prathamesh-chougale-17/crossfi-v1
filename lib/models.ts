@@ -15,6 +15,9 @@ export interface Game {
   publishedToMarketplace: boolean; // Whether game is published to marketplace
   publishedToCommunity: boolean; // Whether game is published to community
   publishedAt?: Date; // When the game was first published
+  tokenId?: string; // NFT token ID if tokenized
+  tokenizedAt?: Date; // When the game was tokenized
+  ipfsHash?: string; // IPFS hash for NFT metadata
 }
 
 export interface GameClient {
@@ -29,6 +32,9 @@ export interface GameClient {
   publishedToMarketplace: boolean; // Whether game is published to marketplace
   publishedToCommunity: boolean; // Whether game is published to community
   publishedAt?: Date; // When the game was first published
+  tokenId?: string; // NFT token ID if tokenized
+  tokenizedAt?: Date; // When the game was tokenized
+  ipfsHash?: string; // IPFS hash for NFT metadata
 }
 
 /**

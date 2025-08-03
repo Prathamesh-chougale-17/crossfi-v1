@@ -2,6 +2,11 @@
 
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
+
+// Utility function to check if address is valid
+function isValidEthereumAddress(address: string): boolean {
+  return address && address.startsWith('0x') && address.length === 42 && /^0x[a-fA-F0-9]{40}$/.test(address);
+}
 import type { 
   GameNFT, 
   RoyaltyInfo, 
@@ -21,6 +26,8 @@ export const GAME_NFT_ABI = [
   'function ownerOf(uint256 tokenId) view returns (address)',
   'function balanceOf(address owner) view returns (uint256)',
   'function tokenURI(uint256 tokenId) view returns (string)',
+  'function games(uint256 tokenId) view returns (address creator, string gameTitle, string gameDescription, string ipfsHash, uint256 createdAt, uint256 totalPlays, uint256 totalForks, uint256 totalStaked, bool isActive)',
+  'function royalties(uint256 tokenId) view returns (uint256 totalEarned, uint256 playEarnings, uint256 forkEarnings, uint256 stakingRewards, uint256 lastClaimed)',
   
   // Write functions
   'function mintGame(address creator, string gameTitle, string gameDescription, string tokenURI, string ipfsHash) returns (uint256)',
@@ -51,9 +58,16 @@ export const PLATFORM_TOKEN_ABI = [
   'function symbol() view returns (string)',
   'function name() view returns (string)',
   
-  // Custom functions
+  // Custom functions from PlatformToken.sol
   'function getRewardPools() view returns (uint256 playPool, uint256 stakingPool, uint256 creatorPool)',
   'function calculateDynamicReward(address user, uint256 baseReward, uint256 activityScore, uint256 loyaltyBonus) view returns (uint256)',
+  'function mintPlayReward(address player, uint256 amount)',
+  'function mintStakingReward(address staker, uint256 amount)',
+  'function mintCreatorReward(address creator, uint256 amount)',
+  'function authorizedMinters(address minter) view returns (bool)',
+  'function playToEarnPool() view returns (uint256)',
+  'function stakingRewardPool() view returns (uint256)',
+  'function creatorRewardPool() view returns (uint256)',
   
   // Events
   'event Transfer(address indexed from, address indexed to, uint256 value)',
@@ -63,32 +77,32 @@ export const PLATFORM_TOKEN_ABI = [
 
 // Contract configuration for different networks
 export const CONTRACT_CONFIGS: Record<number, ContractConfig> = {
-  // CrossFi Mainnet
+  // CrossFi Testnet
   4157: {
-    gameNFT: '0x...', // Deploy addresses here
-    platformToken: '0x...',
-    marketplace: '0x...',
-    staking: '0x...',
-    governance: '0x...',
+    gameNFT: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512', // Will be updated after testnet deployment
+    platformToken: '0x5FbDB2315678afecb367f032d93F642f64180aa3', // Will be updated after testnet deployment
+    marketplace: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
+    staking: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
+    governance: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
     chainId: 4157,
+    blockExplorer: 'https://test.xfiscan.com',
+    rpcUrl: 'https://rpc.testnet.ms',
+  },
+  // CrossFi Mainnet
+  4158: {
+    gameNFT: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+    platformToken: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    marketplace: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
+    staking: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
+    governance: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+    chainId: 4158,
     blockExplorer: 'https://xfiscan.com',
     rpcUrl: 'https://rpc.crossfi.io',
   },
-  // CrossFi Testnet
-  4158: {
-    gameNFT: '0x...',
-    platformToken: '0x...',
-    marketplace: '0x...',
-    staking: '0x...',
-    governance: '0x...',
-    chainId: 4158,
-    blockExplorer: 'https://test.xfiscan.com',
-    rpcUrl: 'https://rpc.testnet.crossfi.io',
-  },
   // Local Development
   1337: {
-    gameNFT: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-    platformToken: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+    gameNFT: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+    platformToken: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     marketplace: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     staking: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
     governance: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
@@ -99,18 +113,18 @@ export const CONTRACT_CONFIGS: Record<number, ContractConfig> = {
 };
 
 export class GameFiContracts {
-  private provider: any;
   private signer?: any;
   private config: ContractConfig;
   private gameNFTContract: any;
   private platformTokenContract: any;
+  private initialized = false;
+  private initializationPromise: Promise<void>;
 
   constructor(
     provider: any,
     chainId: number,
     signer?: any
   ) {
-    this.provider = provider;
     this.signer = signer;
     this.config = CONTRACT_CONFIGS[chainId];
     
@@ -118,19 +132,42 @@ export class GameFiContracts {
       throw new Error(`Unsupported chain ID: ${chainId}`);
     }
 
-    // Initialize contracts with new ethers v6 syntax
-    const ethersV6 = require('ethers');
-    this.gameNFTContract = new ethersV6.Contract(
-      this.config.gameNFT,
-      GAME_NFT_ABI,
-      signer || provider
-    );
+    // Initialize contracts - will be done later with dynamic import
+    this.initializationPromise = this.initializeContracts(signer || provider);
+  }
 
-    this.platformTokenContract = new ethersV6.Contract(
-      this.config.platformToken,
-      PLATFORM_TOKEN_ABI,
-      signer || provider
-    );
+  private async initializeContracts(signerOrProvider: any) {
+    try {
+      // Dynamic import to avoid SSR issues and use proper ethers v6
+      const { ethers } = await import('ethers');
+      
+      this.gameNFTContract = new ethers.Contract(
+        this.config.gameNFT,
+        GAME_NFT_ABI,
+        signerOrProvider
+      );
+
+      this.platformTokenContract = new ethers.Contract(
+        this.config.platformToken,
+        PLATFORM_TOKEN_ABI,
+        signerOrProvider
+      );
+      
+      this.initialized = true;
+    } catch (error) {
+      console.error('Error initializing contracts:', error);
+      throw new Error('Failed to initialize contracts');
+    }
+  }
+
+  public async waitForInitialization(): Promise<void> {
+    return this.initializationPromise;
+  }
+
+  private async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initializationPromise;
+    }
   }
 
   // Game NFT Operations
@@ -138,17 +175,19 @@ export class GameFiContracts {
     gameTitle: string,
     gameDescription: string,
     ipfsHash: string,
-    tokenURI: string
+    tokenURI?: string
   ): Promise<string> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for minting');
     
     try {
+      const finalTokenURI = tokenURI || `https://ipfs.io/ipfs/${ipfsHash}/metadata.json`;
       const creatorAddress = await this.signer.getAddress();
       const tx = await this.gameNFTContract.mintGame(
         creatorAddress,
         gameTitle,
         gameDescription,
-        tokenURI,
+        finalTokenURI,
         ipfsHash
       );
       
@@ -173,6 +212,7 @@ export class GameFiContracts {
     royaltyData: RoyaltyInfo;
     gameScore: number;
   }> {
+    await this.ensureInitialized();
     try {
       const [gameData, royaltyData, gameScore] = await this.gameNFTContract.getGameDetails(tokenId);
       
@@ -214,9 +254,14 @@ export class GameFiContracts {
     score: number,
     duration: number
   ): Promise<void> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for recording play');
     
     try {
+      // Ensure player address is valid
+      if (!isValidEthereumAddress(playerAddress)) {
+        throw new Error('Invalid player address format');
+      }
       const tx = await this.gameNFTContract.recordGamePlay(
         tokenId,
         playerAddress,
@@ -274,6 +319,7 @@ export class GameFiContracts {
 
   // Staking Operations
   async stakeOnGame(tokenId: string, amount: TokenAmount): Promise<void> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for staking');
     
     try {
@@ -299,6 +345,7 @@ export class GameFiContracts {
   }
 
   async unstakeFromGame(tokenId: string, amount: TokenAmount): Promise<void> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for unstaking');
     
     try {
@@ -316,7 +363,12 @@ export class GameFiContracts {
   }
 
   async getStakingInfo(tokenId: string, userAddress: string): Promise<StakingInfo> {
+    await this.ensureInitialized();
     try {
+      // Ensure address is valid
+      if (!userAddress || !userAddress.startsWith('0x')) {
+        throw new Error('Invalid address format');
+      }
       const [stakedAmount, pendingRewards, userShare] = await this.gameNFTContract.getUserStakingInfo(
         tokenId,
         userAddress
@@ -341,6 +393,7 @@ export class GameFiContracts {
 
   // Royalty Operations
   async claimRoyalties(tokenId: string): Promise<void> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for claiming royalties');
     
     try {
@@ -359,7 +412,13 @@ export class GameFiContracts {
 
   // Token Operations
   async getTokenBalance(userAddress: string): Promise<TokenBalance> {
+    await this.ensureInitialized();
     try {
+      // Ensure address is valid and not an ENS name
+      if (!isValidEthereumAddress(userAddress)) {
+        throw new Error('Invalid address format');
+      }
+      
       const balance = await this.platformTokenContract.balanceOf(userAddress);
       
       // In a real implementation, you'd calculate these from various sources
@@ -379,9 +438,14 @@ export class GameFiContracts {
   }
 
   async approveTokenSpending(spender: string, amount: TokenAmount): Promise<void> {
+    await this.ensureInitialized();
     if (!this.signer) throw new Error('Signer required for approval');
     
     try {
+      // Ensure spender address is valid
+      if (!isValidEthereumAddress(spender)) {
+        throw new Error('Invalid spender address format');
+      }
       const tx = await this.platformTokenContract.approve(spender, amount);
       await tx.wait();
       
@@ -395,21 +459,52 @@ export class GameFiContracts {
 
   // Utility Functions
   async getUserGames(userAddress: string): Promise<GameNFT[]> {
+    await this.ensureInitialized();
     try {
+      // Ensure address is valid and not an ENS name
+      if (!isValidEthereumAddress(userAddress)) {
+        throw new Error('Invalid address format');
+      }
+      
       const balance = await this.gameNFTContract.balanceOf(userAddress);
       const games: GameNFT[] = [];
       
-      // This is a simplified implementation
-      // In production, you'd use events or a subgraph to efficiently query user games
-      for (let i = 0; i < balance.toNumber(); i++) {
-        // Would use tokenOfOwnerByIndex if implemented
-        // For now, this is a placeholder
+      // If user has no NFTs, return empty array immediately
+      if (balance.toString() === '0') {
+        return games;
+      }
+      
+      // Check first 1000 token IDs for user's games (reasonable limit for testing)
+      // In production, you'd use events or a subgraph for efficient querying
+      for (let tokenId = 1; tokenId <= 1000; tokenId++) {
+        try {
+          const owner = await this.gameNFTContract.ownerOf(tokenId);
+          if (owner.toLowerCase() === userAddress.toLowerCase()) {
+            const gameDetails = await this.getGameDetails(tokenId.toString());
+            games.push(gameDetails.gameData);
+            
+            // If we found all user's games, break early
+            if (games.length >= balance.toNumber()) {
+              break;
+            }
+          }
+        } catch (error) {
+          // Token doesn't exist yet, we've reached the end
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          if (errorMessage.includes('ERC721: invalid token ID') || 
+              errorMessage.includes('owner query for nonexistent token')) {
+            break;
+          }
+          // Other errors, skip this token
+          continue;
+        }
       }
       
       return games;
     } catch (error) {
       console.error('Error getting user games:', error);
-      throw error;
+      // Return empty array instead of throwing to prevent UI crashes
+      return [];
     }
   }
 

@@ -2,7 +2,7 @@ import { defineChain } from 'viem';
 
 // CrossFi Network Configuration
 export const crossfiMainnet = defineChain({
-  id: 4157,
+  id: 4158,
   name: 'CrossFi',
   nativeCurrency: {
     decimals: 18,
@@ -26,7 +26,7 @@ export const crossfiMainnet = defineChain({
 });
 
 export const crossfiTestnet = defineChain({
-  id: 4158,
+  id: 4157,
   name: 'CrossFi Testnet',
   nativeCurrency: {
     decimals: 18,
@@ -34,8 +34,8 @@ export const crossfiTestnet = defineChain({
     symbol: 'XFI',
   },
   rpcUrls: {
-    default: { http: ['https://rpc.testnet.crossfi.io'] },
-    public: { http: ['https://rpc.testnet.crossfi.io'] },
+    default: { http: ['https://rpc.testnet.ms'] },
+    public: { http: ['https://rpc.testnet.ms'] },
   },
   blockExplorers: {
     default: { name: 'CrossFi Testnet Explorer', url: 'https://test.xfiscan.com' },
