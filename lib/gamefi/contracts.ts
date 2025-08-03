@@ -192,8 +192,25 @@ export class GameFiContracts {
       );
       
       const receipt = await tx.wait();
-      const event = receipt.events?.find((e: any) => e.event === 'GameMinted');
-      const tokenId = event?.args?.tokenId?.toString();
+      
+      // Parse events correctly for ethers v6
+      let tokenId: string | undefined;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = this.gameNFTContract.interface.parseLog(log);
+          if (parsed && parsed.name === 'GameMinted') {
+            tokenId = parsed.args.tokenId.toString();
+            break;
+          }
+        } catch (error) {
+          // Skip logs that can't be parsed
+          continue;
+        }
+      }
+      
+      if (!tokenId) {
+        throw new Error('Failed to get token ID from transaction receipt');
+      }
       
       toast.success('Game NFT Minted!', {
         description: `Token ID: ${tokenId}`,
@@ -225,12 +242,12 @@ export class GameFiContracts {
           gameDescription: gameData.gameDescription,
           ipfsHash: gameData.ipfsHash,
           tokenURI: await this.gameNFTContract.tokenURI(tokenId),
-          createdAt: gameData.createdAt.toNumber(),
-          totalPlays: gameData.totalPlays.toNumber(),
-          totalForks: gameData.totalForks.toNumber(),
+          createdAt: Number(gameData.createdAt),
+          totalPlays: Number(gameData.totalPlays),
+          totalForks: Number(gameData.totalForks),
           totalStaked: gameData.totalStaked.toString(),
           isActive: gameData.isActive,
-          gameScore: gameScore.toNumber(),
+          gameScore: Number(gameScore),
         },
         royaltyData: {
           totalEarned: royaltyData.totalEarned.toString(),
@@ -238,9 +255,9 @@ export class GameFiContracts {
           forkEarnings: royaltyData.forkEarnings.toString(),
           stakingRewards: royaltyData.stakingRewards.toString(),
           lastClaimed: royaltyData.lastClaimed.toString(),
-          pendingAmount: royaltyData.totalEarned.sub(royaltyData.lastClaimed).toString(),
+          pendingAmount: (royaltyData.totalEarned - royaltyData.lastClaimed).toString(),
         },
-        gameScore: gameScore.toNumber(),
+        gameScore: Number(gameScore),
       };
     } catch (error) {
       console.error('Error getting game details:', error);
@@ -302,8 +319,25 @@ export class GameFiContracts {
       );
       
       const receipt = await tx.wait();
-      const event = receipt.events?.find((e: any) => e.event === 'GameForked');
-      const newTokenId = event?.args?.newId?.toString();
+      
+      // Parse events correctly for ethers v6
+      let newTokenId: string | undefined;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = this.gameNFTContract.interface.parseLog(log);
+          if (parsed && parsed.name === 'GameForked') {
+            newTokenId = parsed.args.newId.toString();
+            break;
+          }
+        } catch (error) {
+          // Skip logs that can't be parsed
+          continue;
+        }
+      }
+      
+      if (!newTokenId) {
+        throw new Error('Failed to get new token ID from transaction receipt');
+      }
       
       toast.success('Game Forked Successfully!', {
         description: `New Token ID: ${newTokenId}`,
@@ -380,7 +414,7 @@ export class GameFiContracts {
         tokenId,
         userStaked: stakedAmount.toString(),
         totalStaked: gameDetails.gameData.totalStaked,
-        userShare: userShare.toNumber() / 100, // Convert from basis points
+        userShare: Number(userShare) / 100, // Convert from basis points
         pendingRewards: pendingRewards.toString(),
         rewardPool: '0', // Would get from separate call
         apy: 15.5, // Would calculate based on historical data
@@ -484,7 +518,7 @@ export class GameFiContracts {
             games.push(gameDetails.gameData);
             
             // If we found all user's games, break early
-            if (games.length >= balance.toNumber()) {
+            if (games.length >= Number(balance)) {
               break;
             }
           }

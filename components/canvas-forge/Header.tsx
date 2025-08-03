@@ -134,7 +134,7 @@ export function Header({
           {/* Publishing Actions */}
           <div className="hidden md:flex items-center gap-1 ml-2 pl-2 border-l border-border/40">
             {/* Tokenize Button */}
-            {isGameGenerated && game && game._id && (
+            {game && game._id && (
               <TokenizeButton
                 gameId={game._id}
                 gameTitle={game.name}

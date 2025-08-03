@@ -457,6 +457,25 @@ export default function GameEditorPage() {
         isPublishedToMarketplace={game?.publishedToMarketplace}
         isPublishedToCommunity={game?.publishedToCommunity}
         onGeneratingChange={setIsGenerating}
+        game={game}
+        onNFTMinted={async (tokenId) => {
+          // Update the game state with the new token ID immediately for UI responsiveness
+          setGame(prev => prev ? { ...prev, tokenId } : null);
+          
+          // Also refresh the game data from the database to ensure consistency
+          try {
+            const refreshedGame = await getGameById({
+              gameId,
+              walletAddress: normalizedAddress!,
+            });
+            if (refreshedGame) {
+              setGame(refreshedGame);
+              console.log('✅ Game data refreshed from database after tokenization');
+            }
+          } catch (error) {
+            console.error('Error refreshing game data after tokenization:', error);
+          }
+        }}
       />
       <main className="flex-grow p-4 pt-2">
         <div className="h-full rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl overflow-hidden">

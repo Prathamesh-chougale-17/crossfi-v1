@@ -245,6 +245,9 @@ export async function getUserGames(input: {
             publishedToMarketplace: game.publishedToMarketplace || false,
             publishedToCommunity: game.publishedToCommunity || false,
             publishedAt: game.publishedAt,
+            tokenId: game.tokenId, // Include tokenization fields
+            tokenizedAt: game.tokenizedAt,
+            ipfsHash: game.ipfsHash,
         }));
     } catch (error) {
         console.error('Error fetching user games:', error);
@@ -295,6 +298,9 @@ export async function getGameById(input: {
             publishedToMarketplace: game.publishedToMarketplace || false,
             publishedToCommunity: game.publishedToCommunity || false,
             publishedAt: game.publishedAt,
+            tokenId: game.tokenId, // Include tokenization fields
+            tokenizedAt: game.tokenizedAt,
+            ipfsHash: game.ipfsHash,
         };
 
         return gameWithId;
@@ -994,6 +1000,9 @@ export async function getPublishedGames(input: {
             publishedToMarketplace: game.publishedToMarketplace || false,
             publishedToCommunity: game.publishedToCommunity || false,
             publishedAt: game.publishedAt,
+            tokenId: game.tokenId, // Include tokenization fields
+            tokenizedAt: game.tokenizedAt,
+            ipfsHash: game.ipfsHash,
         }));
     } catch (error) {
         console.error('Error fetching published games:', error);
@@ -1075,6 +1084,9 @@ export async function getPublishedGameById(input: {
             publishedToMarketplace: game.publishedToMarketplace || false,
             publishedToCommunity: game.publishedToCommunity || false,
             publishedAt: game.publishedAt,
+            tokenId: game.tokenId, // Include tokenization fields
+            tokenizedAt: game.tokenizedAt,
+            ipfsHash: game.ipfsHash,
         };
 
         return {
@@ -1182,6 +1194,11 @@ export async function updateGameTokenization(input: {
 
         if (!game) {
             throw new Error('Game not found or not owned by this wallet');
+        }
+
+        // Check if game is already tokenized
+        if (game.tokenId) {
+            throw new Error('Game is already tokenized. Each game can only be tokenized once.');
         }
 
         // Update the game's tokenization status

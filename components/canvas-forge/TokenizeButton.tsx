@@ -39,9 +39,21 @@ export function TokenizeButton({
   const { mintGameNFT, contracts } = useGameFi();
   const { normalizedAddress } = useWallet();
 
+  // Debug logging for tokenization state
+  React.useEffect(() => {
+    console.log(`TokenizeButton: gameId=${gameId}, isTokenized=${isTokenized}, tokenId=${isTokenized ? 'present' : 'none'}`);
+  }, [gameId, isTokenized]);
+
   const handleTokenize = async () => {
     if (!normalizedAddress || !contracts) {
       toast.error('Wallet connection required');
+      return;
+    }
+
+    // Double-check if game is already tokenized
+    if (isTokenized) {
+      toast.info('This game is already tokenized as an NFT');
+      setOpen(false);
       return;
     }
 
@@ -82,19 +94,36 @@ export function TokenizeButton({
       
       // Update the game record with tokenization info
       try {
-        await updateGameTokenization({
+        const dbSuccess = await updateGameTokenization({
           gameId: gameId,
           walletAddress: normalizedAddress,
           tokenId: tokenId,
           ipfsHash: ipfsHash
         });
+        
+        if (!dbSuccess) {
+          console.error('Database update returned false');
+          toast.error('Failed to save tokenization to database');
+          return;
+        }
+        
+        console.log('✅ Game tokenization saved to database successfully');
       } catch (dbError) {
         console.error('Error updating game tokenization in database:', dbError);
-        // Don't fail the whole process if database update fails
+        
+        // Check if it's a duplicate tokenization error
+        if (dbError instanceof Error && dbError.message.includes('already tokenized')) {
+          toast.error('Game Already Tokenized', {
+            description: 'This game has already been converted to an NFT.',
+          });
+        } else {
+          toast.error('Failed to save tokenization to database');
+        }
+        return; // Don't continue if database update fails
       }
       
-      toast.success('Game Tokenized!', {
-        description: `Your game is now an NFT with token ID: ${tokenId}`,
+      toast.success('Game Tokenized Successfully!', {
+        description: `Your game is now an NFT with token ID: ${tokenId}. The tokenization has been saved to the database.`,
       });
       
       // Close dialog and notify parent
@@ -113,7 +142,13 @@ export function TokenizeButton({
 
   if (isTokenized) {
     return (
-      <Button variant="outline" size="sm" disabled className="gap-2">
+      <Button 
+        variant="outline" 
+        size="sm" 
+        disabled 
+        className="gap-2 bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/10 cursor-default"
+        title="This game has been successfully tokenized as an NFT and cannot be tokenized again"
+      >
         <CheckCircle className="h-4 w-4 text-green-500" />
         Tokenized
       </Button>
