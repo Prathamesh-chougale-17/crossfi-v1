@@ -9,7 +9,7 @@ import { NetworkSwitcher } from "./network-switcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
-
+import Image from "next/image";
 const routes = [
   { href: "/", label: "Home" },
   { href: "/editor", label: "Editor" },
@@ -29,8 +29,14 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Code className="h-8 w-8 text-primary drop-shadow-[0_0_8px_hsl(var(--primary))] group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))] transition-all duration-300" />
+            <div className="relative mr-2">
+              <Image 
+              src="/logo.png"
+              alt="Jeu Plaza Logo"
+              width={32}
+              height={32}
+              className="drop-shadow-[0_0_8px_hsl(var(--primary))] group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))] transition-all duration-300"
+              />
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <h1 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent group-hover:from-primary group-hover:to-accent transition-all duration-300">
