@@ -618,3 +618,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Web3 integration via [RainbowKit](https://www.rainbowkit.com/) and [Wagmi](https://wagmi.sh/)
 - UI components from [Radix UI](https://www.radix-ui.com/) and [shadcn/ui](https://ui.shadcn.com/)
 - Design system with OKLCH color space and modern CSS architecture
+  
