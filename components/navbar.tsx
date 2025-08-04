@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import Image from "next/image";
+import { ThemeToggle } from "./darkmode";
 const routes = [
   { href: "/", label: "Home" },
   { href: "/editor", label: "Editor" },
@@ -70,6 +71,7 @@ export function Navbar() {
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle/>
               <ConnectWalletButton />
               <NetworkSwitcher />
             </div>
